@@ -12,10 +12,12 @@ pipeline {
         stage('Deploy Docker Container') {
             steps {
                 echo "Deploying Docker Container..."
-                // Purane container ko stop & remove kar do (agar chal raha ho)
                 sh '''
-                docker ps -q --filter "name=myapp-container" | grep -q . && docker stop myapp-container && docker rm myapp-container || true
-                docker run -d -p 8081:8080 --name myapp-container myapp:latest
+                    # Purana container agar exist karta hai to force stop & remove
+                    docker ps -a -q --filter "name=myapp-container" | grep -q . && docker rm -f myapp-container || true
+                    
+                    # Naya container run karo on port 8081
+                    docker run -d -p 8081:8080 --name myapp-container myapp:latest
                 '''
             }
         }
